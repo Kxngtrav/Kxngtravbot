@@ -6,6 +6,7 @@ import Strategies from './pages/Strategies';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import MT5 from './pages/MT5';
+import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import './styles/global.css';
 
@@ -59,6 +60,7 @@ function App() {
           <Route path="/analytics" element={isAuthenticated ? <Analytics /> : <Navigate to="/login" />} />
           <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
           <Route path="/mt5" element={isAuthenticated ? <MT5 /> : <Navigate to="/login" />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </div>
@@ -67,8 +69,3 @@ function App() {
 }
 
 export default App;
-
-import Admin from './pages/Admin';
-
-// Add this route inside <Routes>
-<Route path="/admin" element={<Admin />} />
