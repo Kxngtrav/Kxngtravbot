@@ -9,16 +9,19 @@ class DerivService {
   private lastDigit: number = 0;
   private currentPrice: number = 0;
   private stake: number = 0.35;
+  private token: string = '';
+  private isConnected: boolean = false;
 
   connect(token: string, isDemo: boolean = true): Promise<void> {
-    console.log(`🔌 Connecting to Deriv...`);
+    this.token = token;
+    console.log(`🔌 Connecting to Deriv ${isDemo ? 'DEMO' : 'REAL'} API...`);
     
     return new Promise((resolve, reject) => {
       try {
         this.socket = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
         
         this.socket.onopen = () => {
-          console.log('WebSocket open');
+          console.log('WebSocket open, authorizing...');
           if (token && token !== 'demo') {
             this.socket?.send(JSON.stringify({ authorize: token }));
           } else {
@@ -32,21 +35,28 @@ class DerivService {
 
         this.socket.onmessage = (event) => {
           const data = JSON.parse(event.data);
+          console.log('📨 Received:', data.msg_type);
           
           if (data.msg_type === 'authorize') {
-            console.log('✅ Connected! Balance:', data.authorize.balance);
+            console.log('✅ Authorized! Balance:', data.authorize.balance);
             this.balance = data.authorize.balance;
+            this.isConnected = true;
             this.emit('connected', { balance: this.balance });
             resolve();
+            // Subscribe to ticks
             this.socket?.send(JSON.stringify({ ticks: 'R_100', subscribe: 1 }));
+            // Subscribe to contract updates
+            this.socket?.send(JSON.stringify({ subscribe: 1, proposal_open_contract: 1 }));
           }
           
           if (data.msg_type === 'new_account_virtual') {
             console.log('✅ Demo account created! Balance:', data.new_account_virtual.balance);
             this.balance = data.new_account_virtual.balance;
+            this.isConnected = true;
             this.emit('connected', { balance: this.balance });
             resolve();
             this.socket?.send(JSON.stringify({ ticks: 'R_100', subscribe: 1 }));
+            this.socket?.send(JSON.stringify({ subscribe: 1, proposal_open_contract: 1 }));
           }
           
           if (data.msg_type === 'tick') {
@@ -56,23 +66,29 @@ class DerivService {
           }
           
           if (data.msg_type === 'buy') {
-            console.log('✅ Trade placed!');
+            console.log('✅ Trade placed!', data);
             this.emit('trade_placed', data);
           }
           
           if (data.msg_type === 'proposal_open_contract') {
-            if (data.proposal_open_contract.is_sold) {
-              const profit = data.proposal_open_contract.profit;
+            const contract = data.proposal_open_contract;
+            console.log('📊 Contract update:', contract);
+            
+            if (contract.is_sold) {
+              const profit = contract.profit;
               this.balance += profit;
+              
               const tradeData = {
-                id: data.proposal_open_contract.contract_id,
-                type: data.proposal_open_contract.contract_type,
-                stake: data.proposal_open_contract.buy_price,
+                id: contract.contract_id,
+                type: contract.contract_type,
+                stake: contract.buy_price,
                 profit: profit,
                 win: profit > 0,
-                timestamp: new Date()
+                timestamp: new Date(contract.exit_tick_time || Date.now()),
+                digit: Math.floor(contract.exit_tick || this.currentPrice) % 10
               };
-              console.log('💰 Trade result:', profit > 0 ? 'WIN' : 'LOSS', 'Profit:', profit);
+              
+              console.log('💰 TRADE COMPLETED:', tradeData);
               this.emit('trade', tradeData);
               this.emit('balance', { balance: this.balance });
             }
@@ -122,9 +138,11 @@ class DerivService {
           if (data.msg_type === 'new_account_virtual') {
             console.log('✅ Demo account created! Balance:', data.new_account_virtual.balance);
             this.balance = data.new_account_virtual.balance;
+            this.isConnected = true;
             this.emit('connected', { balance: this.balance });
             resolve();
             this.socket?.send(JSON.stringify({ ticks: 'R_100', subscribe: 1 }));
+            this.socket?.send(JSON.stringify({ subscribe: 1, proposal_open_contract: 1 }));
           }
           
           if (data.msg_type === 'tick') {
@@ -134,7 +152,7 @@ class DerivService {
           }
           
           if (data.msg_type === 'error') {
-            console.error('Error creating demo account:', data.error);
+            console.error('Error:', data.error);
             reject(data.error);
           }
         };
@@ -145,7 +163,7 @@ class DerivService {
   }
 
   placeTrade(contract: any) {
-    console.log('📤 Placing trade:', contract.contract_type);
+    console.log('📤 Placing trade:', contract);
     
     const proposalRequest = {
       proposal: 1,
@@ -223,7 +241,9 @@ class DerivService {
 
   disconnect() {
     this.stopAutoTrading();
-    this.socket?.close();
+    if (this.socket) {
+      this.socket.close();
+    }
   }
 }
 
