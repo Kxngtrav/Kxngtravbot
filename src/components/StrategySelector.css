@@ -1,0 +1,132 @@
+.strategy-selector {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.selector-header h3 {
+  color: white;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0f0f1a;
+  border: 1px solid #2d2d3a;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.strategies-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.strategy-card {
+  background: #0f0f1a;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid #2d2d3a;
+}
+
+.strategy-card:hover {
+  transform: translateX(4px);
+  border-color: #3b82f6;
+}
+
+.strategy-card.selected {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-header h4 {
+  color: white;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.win-rate {
+  background: #2d2d3a;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #10b981;
+}
+
+.win-rate.elite {
+  background: #10b981;
+  color: white;
+}
+
+.description {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.card-footer {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge.auto {
+  background: #3b82f6;
+  color: white;
+}
+
+.badge.manual {
+  background: #8b5cf6;
+  color: white;
+}
+
+.badge.both {
+  background: #10b981;
+  color: white;
+}
+
+.badge.risk-low {
+  background: #10b981;
+  color: white;
+}
+
+.badge.risk-medium {
+  background: #f59e0b;
+  color: white;
+}
+
+.badge.risk-high {
+  background: #ef4444;
+  color: white;
+}

@@ -1,0 +1,226 @@
+.trading-controls {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.price-info {
+  display: flex;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.control-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 4px;
+  background: #0f0f1a;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.mode-selector button {
+  padding: 8px 20px;
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mode-selector button.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.hedge-toggle {
+  padding: 8px 20px;
+  background: #0f0f1a;
+  color: #94a3b8;
+  border: 1px solid #ec4899;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.hedge-toggle.active {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6);
+  color: white;
+  border: none;
+}
+
+.duration-control {
+  display: flex;
+  gap: 8px;
+}
+
+.duration-control input {
+  width: 60px;
+  padding: 8px;
+  background: #0f0f1a;
+  border: 1px solid #2d2d3a;
+  border-radius: 6px;
+  color: white;
+  text-align: center;
+}
+
+.duration-control select {
+  padding: 8px;
+  background: #0f0f1a;
+  border: 1px solid #2d2d3a;
+  border-radius: 6px;
+  color: white;
+}
+
+.stake-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0f0f1a;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #2d2d3a;
+}
+
+.stake-control label {
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.stake-control input {
+  width: 70px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: white;
+}
+
+.reset-section {
+  margin: 8px 0;
+  text-align: center;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 10px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reset-confirm {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: #2d2d3a;
+  border-radius: 8px;
+}
+
+.reset-confirm span {
+  color: white;
+}
+
+.confirm-yes {
+  padding: 4px 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-no {
+  padding: 4px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.manual-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.button-row button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-even { background: #10b981; color: white; }
+.btn-odd { background: #f59e0b; color: white; }
+.btn-over { background: #3b82f6; color: white; }
+.btn-under { background: #8b5cf6; color: white; }
+.btn-match { background: #ec4899; color: white; }
+.btn-diff { background: #ef4444; color: white; }
+
+.hedge-info {
+  background: rgba(236, 72, 153, 0.1);
+  border: 1px solid #ec4899;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hedge-info p {
+  color: #ec4899;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.start-stop-btn {
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.start-stop-btn.start { background: linear-gradient(90deg, #10b981, #059669); color: white; }
+.start-stop-btn.stop { background: linear-gradient(90deg, #ef4444, #dc2626); color: white; }
+
+.warning {
+  color: #ef4444;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0;
+}

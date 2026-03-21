@@ -1,0 +1,54 @@
+.recent-trades {
+  padding: 20px;
+  height: 100%;
+}
+
+.recent-trades h3 {
+  color: white;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+.trades-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+th {
+  text-align: left;
+  padding: 10px;
+  color: #94a3b8;
+  border-bottom: 1px solid #2d2d3a;
+}
+
+td {
+  padding: 10px;
+  color: white;
+  border-bottom: 1px solid #2d2d3a;
+}
+
+.profit {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.loss {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.win {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.no-trades {
+  text-align: center;
+  color: #64748b;
+  padding: 40px;
+}

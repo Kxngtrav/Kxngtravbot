@@ -1,0 +1,66 @@
+.account-info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.info-card {
+  background: #0f0f1a;
+  padding: 12px 20px;
+  border-radius: 12px;
+  min-width: 100px;
+  text-align: center;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.info-label {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.info-value.price {
+  color: #3b82f6;
+}
+
+.info-value.digit {
+  color: #8b5cf6;
+  font-size: 1.8rem;
+}
+
+.info-value.mode {
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.status-badge.connected {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.status-badge.disconnected {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.platform-badge {
+  font-size: 0.7rem;
+  margin-top: 4px;
+  color: #8b5cf6;
+}

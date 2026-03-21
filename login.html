@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KxngTrav AI - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0c10 0%, #1a1f2b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #1a1f2b;
+            padding: 40px;
+            border-radius: 30px;
+            width: 400px;
+            border: 1px solid #2a2f3a;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            font-size: 32px;
+            color: white;
+        }
+        .logo span {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+        .tabs {
+            display: flex;
+            background: #0f1218;
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 50px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        #message {
+            color: #ef4444;
+            margin-top: 15px;
+            text-align: center;
+        }
+        #registerForm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>KxngTrav <span>AI</span></h1>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showLogin()">Login</div>
+            <div class="tab" onclick="showRegister()">Register</div>
+        </div>
+        
+        <div id="loginForm">
+            <div class="form-group">
+                <input type="text" id="loginUsername" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password">
+            </div>
+            <button onclick="handleLogin()">Login</button>
+        </div>
+        
+        <div id="registerForm">
+            <div class="form-group">
+                <input type="text" id="regUsername" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <input type="email" id="regEmail" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="password" id="regPassword" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <input type="password" id="regConfirm" placeholder="Confirm Password">
+            </div>
+            <button onclick="handleRegister()">Register</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function showLogin() {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.querySelectorAll('.tab')[1].classList.remove('active');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('message').innerHTML = '';
+        }
+
+        function showRegister() {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.querySelectorAll('.tab')[0].classList.remove('active');
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('message').innerHTML = '';
+        }
+
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                document.getElementById('message').innerHTML = 'Please fill all fields';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/dashboard.html';
+                } else {
+                    document.getElementById('message').innerHTML = data.error;
+                }
+            } catch (err) {
+                document.getElementById('message').innerHTML = 'Connection error';
+            }
+        }
+
+        async function handleRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            
+            if (!username || !email || !password || !confirm) {
+                document.getElementById('message').innerHTML = 'Please fill all fields';
+                return;
+            }
+            
+            if (password !== confirm) {
+                document.getElementById('message').innerHTML = 'Passwords do not match';
+                return;
+            }
+            
+            if (password.length < 6) {
+                document.getElementById('message').innerHTML = 'Password must be at least 6 characters';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('Registration successful! Please login.');
+                    showLogin();
+                } else {
+                    document.getElementById('message').innerHTML = data.error;
+                }
+            } catch (err) {
+                document.getElementById('message').innerHTML = 'Connection error';
+            }
+        }
+    </script>
+</body>
+</html>

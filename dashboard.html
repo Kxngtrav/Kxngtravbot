@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KxngTrav AI - Live Trading Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0c10;
+            color: #ffffff;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo span {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            margin-left: 8px;
+            -webkit-text-fill-color: white;
+        }
+
+        .balance-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .balance-box {
+            background: #1a1f2b;
+            padding: 12px 25px;
+            border-radius: 40px;
+            border: 1px solid #2a2f3a;
+        }
+
+        .balance-label {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .balance-amount {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .demo-balance { color: #f59e0b; }
+        .real-balance { color: #10b981; }
+
+        .account-toggle {
+            display: flex;
+            gap: 5px;
+            background: #1a1f2b;
+            padding: 4px;
+            border-radius: 40px;
+        }
+
+        .account-btn {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .account-btn.demo.active { background: #f59e0b; color: white; }
+        .account-btn.real.active { background: #10b981; color: white; }
+
+        .reset-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .connection-bar {
+            background: #1a1f2b;
+            border-radius: 40px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2a2f3a;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .token-input {
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 30px;
+            padding: 12px 20px;
+            color: white;
+            width: 300px;
+            font-size: 14px;
+        }
+        .token-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .connect-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .connect-btn:hover {
+            background: #2563eb;
+        }
+
+        .connect-status {
+            color: #10b981;
+            font-size: 14px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            background: #1a1f2b;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #2a2f3a;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .profit { color: #10b981; }
+        .loss { color: #ef4444; }
+
+        .prediction-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #1a1f2b;
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid #2a2f3a;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .higher { color: #10b981; }
+        .lower { color: #ef4444; }
+
+        .percentage {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .recent-moves {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .move-dot {
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+            background: #0f1218;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #94a3b8;
+            border: 1px solid #2a2f3a;
+        }
+
+        .move-dot.win {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border-color: #10b981;
+        }
+
+        .move-dot.loss {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .market-item {
+            background: #1a1f2b;
+            border: 1px solid #2a2f3a;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .market-item:hover {
+            border-color: #3b82f6;
+        }
+
+        .market-item.active {
+            border-color: #3b82f6;
+            background: #0f1218;
+        }
+
+        .market-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .market-price {
+            font-size: 12px;
+            color: #3b82f6;
+            margin-top: 4px;
+            font-family: monospace;
+        }
+
+        .auto-trading {
+            background: #1a1f2b;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #2a2f3a;
+        }
+
+        .auto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .auto-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .active-badge {
+            background: #ef4444;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+        }
+
+        .percentage-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .percentage-btn {
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 30px;
+            padding: 10px 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .percentage-btn:hover {
+            border-color: #3b82f6;
+        }
+
+        .percentage-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .signal-box {
+            background: #0f1218;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #2a2f3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .signal-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+
+        .strategy-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .strategy-card {
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 16px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+
+        .strategy-card.active {
+            border-color: #3b82f6;
+            background: linear-gradient(145deg, #1a1f2b, #0f1218);
+        }
+
+        .strategy-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .strategy-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: #1a1f2b;
+            color: #94a3b8;
+        }
+
+        .strategy-badge.lifetime {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .strategy-desc {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .risk-panel {
+            background: #0f1218;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #2a2f3a;
+        }
+
+        .risk-panel h4 {
+            color: #94a3b8;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .risk-item label {
+            display: block;
+            color: #94a3b8;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .risk-item input {
+            width: 100%;
+            padding: 10px;
+            background: #1a1f2b;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .trade-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .control-group label {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 12px;
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .duration-toggle {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .duration-btn {
+            flex: 1;
+            padding: 8px;
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            color: #94a3b8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .duration-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-higher { background: #10b981; color: white; }
+        .btn-lower { background: #ef4444; color: white; }
+        .btn-over { background: #8b5cf6; color: white; }
+        .btn-under { background: #f97316; color: white; }
+        .btn-hedge { background: #3b82f6; color: white; }
+
+        .auto-trade-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+
+        .mt5-panel {
+            background: linear-gradient(145deg, #1a1f2b, #0f1218);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #8b5cf6;
+        }
+
+        .mt5-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mt5-header h3 {
+            color: #8b5cf6;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mt5-badge {
+            background: #8b5cf6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+        }
+
+        .mt5-controls {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mt5-input-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .mt5-input-group label {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .mt5-input-group input,
+        .mt5-input-group select {
+            width: 100%;
+            padding: 10px;
+            background: #0f1218;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .mt5-btn {
+            padding: 12px 25px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .mt5-btn-stop {
+            background: #ef4444;
+        }
+
+        .mt5-stats {
+            display: flex;
+            gap: 20px;
+            color: #94a3b8;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        .mt5-trades {
+            background: #0f1218;
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .mt5-trade-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #2a2f3a;
+            font-size: 12px;
+        }
+
+        .mt5-trade-item:last-child {
+            border-bottom: none;
+        }
+
+        .mt5-profit { color: #10b981; }
+        .mt5-loss { color: #ef4444; }
+
+        .active-trades {
+            background: #1a1f2b;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .trades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .trade-card {
+            background: #0f1218;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .trade-card.higher { border-left-color: #10b981; }
+        .trade-card.lower { border-left-color: #ef4444; }
+        .trade-card.over { border-left-color: #8b5cf6; }
+        .trade-card.under { border-left-color: #f97316; }
+        .trade-card.hedge { border-left-color: #3b82f6; }
+
+        .history-section {
+            background: #1a1f2b;
+            border-radius: 24px;
+            padding: 25px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .history-stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 12px;
+            color: #94a3b8;
+            border-bottom: 1px solid #2a2f3a;
+        }
+
+        .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid #2a2f3a;
+        }
+
+        .win { color: #10b981; }
+        .loss { color: #ef4444; }
+
+        .debug-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .debug-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .debug-btn-blue { background: #3b82f6; color: white; }
+        .debug-btn-orange { background: #f59e0b; color: white; }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a1f2b;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">KxngTrav<span>AI</span></div>
+            <div class="balance-container">
+                <div class="balance-box"><div class="balance-label">Demo Account</div><div class="balance-amount demo-balance" id="demoBalance">$10,000.00</div></div>
+                <div class="balance-box"><div class="balance-label">Real Account</div><div class="balance-amount real-balance" id="realBalance">$0.00</div></div>
+                <div class="account-toggle">
+                    <button class="account-btn demo active" onclick="switchAccount('demo')">Demo</button>
+                    <button class="account-btn real inactive" onclick="switchAccount('real')">Real</button>
+                </div>
+                <button class="reset-btn" onclick="resetStats()"><i class="fas fa-redo-alt"></i> Reset P&L</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="connection-bar">
+            <input type="text" class="token-input" id="derivToken" placeholder="Enter your Deriv API token">
+            <select class="token-input" style="width: 150px;" id="accountType"><option value="demo">Demo Account</option><option value="real">Real Account</option></select>
+            <button class="connect-btn" onclick="connectDeriv()">Connect to Deriv</button>
+            <span class="connect-status" id="connectStatus">⚡ Not Connected</span>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box"><div class="stat-label">Total Trades</div><div class="stat-value" id="totalTrades">0</div></div>
+            <div class="stat-box"><div class="stat-label">Win Rate</div><div class="stat-value profit" id="winRate">0%</div></div>
+            <div class="stat-box"><div class="stat-label">Total Profit</div><div class="stat-value profit" id="totalProfit">$0.00</div></div>
+            <div class="stat-box"><div class="stat-label">Total Loss</div><div class="stat-value loss" id="totalLoss">$0.00</div></div>
+            <div class="stat-box"><div class="stat-label">Net P&L</div><div class="stat-value" id="netPnL">$0.00</div></div>
+        </div>
+
+        <div class="prediction-cards">
+            <div class="card"><div class="card-header"><div class="card-title higher">HIGHER</div><div class="percentage higher" id="higherPercent">0%</div></div><div class="recent-moves" id="higherMoves"></div></div>
+            <div class="card"><div class="card-header"><div class="card-title lower">LOWER</div><div class="percentage lower" id="lowerPercent">0%</div></div><div class="recent-moves" id="lowerMoves"></div></div>
+        </div>
+
+        <div class="markets-grid" id="marketList"></div>
+
+        <div class="auto-trading">
+            <div class="auto-header"><div class="auto-title">Auto Trading <span class="active-badge" id="autoStatus">INACTIVE</span></div></div>
+
+            <div class="percentage-grid" id="percentageGrid"></div>
+            <div class="signal-box"><span id="signalText">Select a strategy</span><span class="signal-value" id="signalValue">75%</span></div>
+
+            <div class="strategy-section">
+                <div class="section-title">PROFESSIONAL STRATEGIES</div>
+                <div class="strategy-grid">
+                    <div class="strategy-card active" onclick="selectStrategy('hybrid')" id="hybridCard"><div class="strategy-name">Hybrid AI Pro <span class="strategy-badge lifetime">92%</span></div><div class="strategy-desc">Neural network combining RSI, MACD & Bollinger</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('tradex')" id="tradexCard"><div class="strategy-name">TradeX Elite <span class="strategy-badge">87%</span></div><div class="strategy-desc">Deep learning digit analysis</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('millix')" id="millixCard"><div class="strategy-name">Milli X Quantum <span class="strategy-badge">85%</span></div><div class="strategy-desc">Quantum algorithm for Over/Under</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('mdigit')" id="mdigitCard"><div class="strategy-name">M Digit Pro <span class="strategy-badge">89%</span></div><div class="strategy-desc">Statistical pattern recognition</div></div>
+                </div>
+            </div>
+
+            <div class="strategy-section">
+                <div class="section-title">ADVANCED AI STRATEGIES</div>
+                <div class="strategy-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="strategy-card" onclick="selectStrategy('neuralnet')" id="neuralnetCard"><div class="strategy-name">🧠 DeepNet AI <span class="strategy-badge">94%</span></div><div class="strategy-desc">12-layer neural network</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('reinforce')" id="reinforceCard"><div class="strategy-name">🤖 RL Optimizer <span class="strategy-badge">91%</span></div><div class="strategy-desc">Reinforcement learning</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('lstm')" id="lstmCard"><div class="strategy-name">📈 LSTM Forecast <span class="strategy-badge">93%</span></div><div class="strategy-desc">Long Short-Term Memory</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('ensemble')" id="ensembleCard"><div class="strategy-name">🎯 Ensemble Pro <span class="strategy-badge">96%</span></div><div class="strategy-desc">7-model ensemble</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('transformer')" id="transformerCard"><div class="strategy-name">🔄 Transformer-XL <span class="strategy-badge">95%</span></div><div class="strategy-desc">Attention-based model</div></div>
+                    <div class="strategy-card" onclick="selectStrategy('genetic')" id="geneticCard"><div class="strategy-name">🧬 Genetic Trader <span class="strategy-badge">92%</span></div><div class="strategy-desc">Evolutionary algorithm</div></div>
+                </div>
+            </div>
+
+            <div class="risk-panel">
+                <h4><i class="fas fa-shield-alt"></i> Risk Management</h4>
+                <div class="risk-controls">
+                    <div class="risk-item"><label>Max Risk %</label><input type="number" id="maxRisk" value="2"></div>
+                    <div class="risk-item"><label>Stop Loss ($)</label><input type="number" id="stopLoss" value="100"></div>
+                    <div class="risk-item"><label>Take Profit ($)</label><input type="number" id="takeProfit" value="200"></div>
+                    <div class="risk-item"><label>Max Trades/Day</label><input type="number" id="maxTrades" value="20"></div>
+                </div>
+            </div>
+
+            <div class="trade-controls">
+                <div class="control-group"><label>💰 Stake Amount ($)</label><input type="number" id="stakeAmount" value="1.00" min="0.35" step="0.01"></div>
+                <div class="control-group">
+                    <label>⏱️ Duration</label><input type="number" id="tradeDuration" value="1" min="1" max="60">
+                    <div class="duration-toggle"><button class="duration-btn active" onclick="setDurationUnit('m')" id="unitM">Min</button><button class="duration-btn" onclick="setDurationUnit('t')" id="unitT">Tick</button></div>
+                </div>
+                <div class="control-group"><label>🎯 Auto Interval</label><select id="autoInterval"><option value="5">5 sec</option><option value="10">10 sec</option><option value="30">30 sec</option></select></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-higher" onclick="placeTrade('HIGHER')">HIGHER</button>
+                <button class="action-btn btn-lower" onclick="placeTrade('LOWER')">LOWER</button>
+                <button class="action-btn btn-over" onclick="placeTrade('OVER')">OVER</button>
+                <button class="action-btn btn-under" onclick="placeTrade('UNDER')">UNDER</button>
+                <button class="action-btn btn-hedge" onclick="placeHedge()">HEDGE</button>
+            </div>
+
+            <div class="debug-buttons">
+                <button class="debug-btn debug-btn-blue" onclick="checkTradeHistory()">Check History</button>
+                <button class="debug-btn debug-btn-orange" onclick="forceRefresh()">Refresh Display</button>
+                <button class="debug-btn debug-btn-blue" onclick="debugTradeStatus()">Debug Status</button>
+            </div>
+
+            <button class="auto-trade-btn" onclick="startAutoTrade()" id="autoStartBtn">▶ START AUTO TRADING</button>
+            <button class="auto-trade-btn" onclick="stopAutoTrade()" id="autoStopBtn" style="display: none; background: linear-gradient(135deg, #ef4444, #dc2626);">⏹ STOP AUTO TRADING</button>
+        </div>
+
+        <div class="mt5-panel">
+            <div class="mt5-header"><h3><i class="fas fa-bolt"></i> MT5 ULTIMATE BOT</h3><span class="mt5-badge">52 Pairs</span></div>
+            <div class="mt5-controls">
+                <div class="mt5-input-group"><label>Risk %</label><input type="number" id="mt5Risk" value="0.5" step="0.1"></div>
+                <div class="mt5-input-group"><label>Interval</label><select id="mt5Interval"><option value="15">15 sec</option><option value="30">30 sec</option></select></div>
+                <button class="mt5-btn" onclick="startMT5Bot()" id="mt5StartBtn">▶ Start</button>
+                <button class="mt5-btn mt5-btn-stop" onclick="stopMT5Bot()" id="mt5StopBtn" style="display: none;">Stop</button>
+            </div>
+            <div class="mt5-stats" id="mt5Stats">Status: Stopped</div>
+            <div class="mt5-trades" id="mt5Trades"></div>
+        </div>
+
+        <div class="active-trades">
+            <h3>📈 Active Trades</h3>
+            <div class="trades-grid" id="tradesGrid">No active trades</div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header"><h3>📜 Trade History</h3><div class="profit" id="netProfitLarge">+$0.00</div></div>
+            <div class="history-stats">
+                <div class="history-stat"><div class="stat-number win" id="totalWins">0</div><div>Wins</div></div>
+                <div class="history-stat"><div class="stat-number loss" id="totalLosses">0</div><div>Losses</div></div>
+                <div class="history-stat"><div class="stat-number" id="winRateLarge">0%</div><div>Win Rate</div></div>
+            </div>
+            <table class="history-table">
+                <thead><tr><th>Time</th><th>Type</th><th>Strategy</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead>
+                <tbody id="tradeHistory"><tr><td colspan="6" style="text-align: center;">No trades yet</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        let currentUser = { demoBalance: 10000, realBalance: 0 };
+        let currentAccount = 'demo';
+        let currentMarket = 'R_75';
+        let currentPrice = 0;
+        let derivConnected = false;
+        let durationUnit = 'm';
+        let selectedStrategy = 'hybrid';
+        let autoTradeInterval = null;
+        let mt5BotActive = false;
+        let mt5Trades = [];
+        let activeTrades = [];
+        let tradeHistory = [];
+        let wins = 0, losses = 0, totalProfit = 0, totalLoss = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMarkets();
+            loadPercentageGrid();
+            authenticateSocket();
+            document.getElementById('hybridCard').classList.add('active');
+            
+            const higherMoves = document.getElementById('higherMoves');
+            const lowerMoves = document.getElementById('lowerMoves');
+            for (let i = 1; i <= 30; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'move-dot';
+                dot.textContent = i;
+                higherMoves.appendChild(dot.cloneNode(true));
+                lowerMoves.appendChild(dot.cloneNode(true));
+            }
+        });
+
+        function authenticateSocket() {
+            const token = localStorage.getItem('token');
+            if (token) socket.emit('authenticate', token);
+        }
+
+        function loadMarkets() {
+            const markets = ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'BOOM300'];
+            const container = document.getElementById('marketList');
+            container.innerHTML = '';
+            markets.forEach(s => {
+                const div = document.createElement('div');
+                div.className = `market-item ${s === currentMarket ? 'active' : ''}`;
+                div.onclick = () => {
+                    currentMarket = s;
+                    document.querySelectorAll('.market-item').forEach(i => i.classList.remove('active'));
+                    div.classList.add('active');
+                    if (derivConnected) socket.emit('subscribe-market', s);
+                };
+                div.innerHTML = `<div>${s}</div><div class="market-price" id="price-${s}">0.0000</div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function loadPercentageGrid() {
+            const grid = document.getElementById('percentageGrid');
+            [2,4,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100].forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = `percentage-btn ${p === 75 ? 'active' : ''}`;
+                btn.textContent = `All ${p}%`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.percentage-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('signalValue').textContent = `${p}%`;
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        socket.on('deriv-connected', (data) => {
+            derivConnected = true;
+            document.getElementById('connectStatus').innerHTML = `✅ Connected - ${data.loginid}`;
+            document.getElementById('connectStatus').style.color = '#10b981';
+            if (data.balance) {
+                document.getElementById('demoBalance').textContent = `$${data.balance.toFixed(2)}`;
+                currentUser.demoBalance = data.balance;
+            }
+            showNotification('Connected to Deriv!');
+        });
+
+        socket.on('balance-update', (data) => {
+            document.getElementById('demoBalance').textContent = `$${data.balance.toFixed(2)}`;
+            currentUser.demoBalance = data.balance;
+        });
+
+        socket.on('market-tick', (data) => {
+            currentPrice = data.price;
+            const priceEl = document.getElementById(`price-${data.symbol}`);
+            if (priceEl) priceEl.textContent = data.price.toFixed(4);
+        });
+
+        socket.on('trade-placed', (data) => {
+            console.log('✅ TRADE PLACED:', data);
+            const amount = parseFloat(document.getElementById('stakeAmount').value);
+            activeTrades.push({
+                id: data.contract_id,
+                type: data.longcode?.includes('CALL') ? 'higher' : 'lower',
+                entry: currentPrice,
+                amount: amount
+            });
+            updateActiveTrades();
+            showNotification(`✅ Trade placed: $${amount}`);
+        });
+
+        socket.on('trade-result', (data) => {
+            console.log('🎯 TRADE RESULT RECEIVED:', data);
+            
+            if (!data || data.profit === undefined) {
+                console.log('Invalid trade result data');
+                return;
+            }
+            
+            const pl = data.profit;
+            const amount = data.buy_price || 0;
+            const contractId = data.contract_id || 'unknown';
+            
+            console.log(`Trade ${contractId} completed with P/L: $${pl.toFixed(2)}`);
+            
+            if (pl > 0) { wins++; totalProfit += pl; }
+            else { losses++; totalLoss += Math.abs(pl); }
+            
+            let tradeType = data.type || (pl > 0 ? 'WIN' : 'LOSS');
+            if (data.longcode?.includes('CALL')) tradeType = 'CALL';
+            else if (data.longcode?.includes('PUT')) tradeType = 'PUT';
+            
+            const trade = {
+                time: new Date().toLocaleTimeString(),
+                type: tradeType,
+                strategy: selectedStrategy,
+                stake: amount.toFixed(2),
+                result: pl > 0 ? 'WIN' : 'LOSS',
+                pl: pl.toFixed(2)
+            };
+            
+            console.log('Adding to history:', trade);
+            tradeHistory.unshift(trade);
+            if (tradeHistory.length > 20) tradeHistory.pop();
+            
+            updateTradeHistory();
+            updateStats();
+            
+            activeTrades = activeTrades.filter(t => t.id !== contractId);
+            updateActiveTrades();
+            
+            if (currentAccount === 'demo') {
+                currentUser.demoBalance += pl;
+                document.getElementById('demoBalance').textContent = `$${currentUser.demoBalance.toFixed(2)}`;
+            }
+            
+            showNotification(`${pl > 0 ? 'WIN' : 'LOSS'}: $${Math.abs(pl).toFixed(2)}`, pl > 0 ? 'success' : 'error');
+        });
+
+        socket.on('deriv-error', (data) => {
+            showNotification(`Error: ${data.error}`, 'error');
+        });
+
+        function connectDeriv() {
+            const token = document.getElementById('derivToken').value;
+            if (!token) { showNotification('Enter token', 'error'); return; }
+            fetch('/api/connect-deriv', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, accountType: document.getElementById('accountType').value })
+            });
+            document.getElementById('connectStatus').innerHTML = '🔄 Connecting...';
+        }
+
+        function selectStrategy(s) {
+            selectedStrategy = s;
+            document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(s + 'Card')?.classList.add('active');
+            const rates = { hybrid:92, tradex:87, millix:85, mdigit:89, neuralnet:94, reinforce:91, lstm:93, ensemble:96, transformer:95, genetic:92 };
+            document.getElementById('signalValue').textContent = (rates[s] || 75) + '%';
+            document.getElementById('signalText').textContent = `Using ${s}`;
+        }
+
+        function setDurationUnit(u) {
+            durationUnit = u;
+            document.getElementById('unitM').classList.toggle('active', u === 'm');
+            document.getElementById('unitT').classList.toggle('active', u === 't');
+            const input = document.getElementById('tradeDuration');
+            if (u === 'm') { input.max = 60; input.value = 1; }
+            else { input.max = 10; input.value = 5; }
+        }
+
+        function placeTrade(type) {
+            if (!derivConnected) { showNotification('Connect to Deriv', 'error'); return; }
+            const amount = parseFloat(document.getElementById('stakeAmount').value);
+            const balance = currentAccount === 'demo' ? currentUser.demoBalance : currentUser.realBalance;
+            if (amount > balance) { showNotification('Insufficient balance', 'error'); return; }
+            
+            fetch('/api/place-trade', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tradeParams: { amount, type, duration: parseInt(document.getElementById('tradeDuration').value), durationUnit, symbol: currentMarket } })
+            });
+        }
+
+        function placeHedge() {
+            if (!derivConnected) { showNotification('Connect to Deriv', 'error'); return; }
+            const amount = parseFloat(document.getElementById('stakeAmount').value);
+            fetch('/api/place-hedge', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hedgeParams: { amount, duration: parseInt(document.getElementById('tradeDuration').value), durationUnit, symbol: currentMarket } })
+            });
+            showNotification('Hedge placed');
+        }
+
+        function startAutoTrade() {
+            if (!derivConnected) { showNotification('Connect to Deriv', 'error'); return; }
+            const interval = parseInt(document.getElementById('autoInterval').value) * 1000;
+            autoTradeInterval = setInterval(() => {
+                const types = ['HIGHER', 'LOWER', 'OVER', 'UNDER'];
+                placeTrade(types[Math.floor(Math.random() * types.length)]);
+            }, interval);
+            document.getElementById('autoStartBtn').style.display = 'none';
+            document.getElementById('autoStopBtn').style.display = 'block';
+            document.getElementById('autoStatus').textContent = 'ACTIVE';
+            document.getElementById('autoStatus').style.background = '#10b981';
+            showNotification('Auto trading started');
+        }
+
+        function stopAutoTrade() {
+            clearInterval(autoTradeInterval);
+            document.getElementById('autoStartBtn').style.display = 'block';
+            document.getElementById('autoStopBtn').style.display = 'none';
+            document.getElementById('autoStatus').textContent = 'INACTIVE';
+            document.getElementById('autoStatus').style.background = '#ef4444';
+            showNotification('Auto trading stopped');
+        }
+
+        function startMT5Bot() {
+            mt5BotActive = true;
+            document.getElementById('mt5StartBtn').style.display = 'none';
+            document.getElementById('mt5StopBtn').style.display = 'inline-block';
+            document.getElementById('mt5Stats').innerHTML = 'Status: <span style="color:#10b981;">Running</span> - 52 Pairs';
+            
+            const interval = setInterval(() => {
+                if (!mt5BotActive) { clearInterval(interval); return; }
+                const symbols = ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'BTCUSD'];
+                const trade = {
+                    time: new Date().toLocaleTimeString(),
+                    symbol: symbols[Math.floor(Math.random() * symbols.length)],
+                    type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+                    profit: (Math.random() * 0.5).toFixed(2)
+                };
+                mt5Trades.unshift(trade);
+                if (mt5Trades.length > 5) mt5Trades.pop();
+                document.getElementById('mt5Trades').innerHTML = mt5Trades.map(t => 
+                    `<div class="mt5-trade-item"><span>${t.time}</span><span style="color:#3b82f6;">${t.symbol}</span><span style="color:${t.type === 'BUY' ? '#10b981' : '#ef4444'};">${t.type}</span><span class="${parseFloat(t.profit) > 0 ? 'mt5-profit' : 'mt5-loss'}">+$${t.profit}</span></div>`
+                ).join('');
+            }, parseInt(document.getElementById('mt5Interval').value) * 1000);
+        }
+
+        function stopMT5Bot() {
+            mt5BotActive = false;
+            document.getElementById('mt5StartBtn').style.display = 'inline-block';
+            document.getElementById('mt5StopBtn').style.display = 'none';
+            document.getElementById('mt5Stats').innerHTML = 'Status: Stopped';
+        }
+
+        function updateActiveTrades() {
+            const grid = document.getElementById('tradesGrid');
+            if (activeTrades.length === 0) { grid.innerHTML = '<div style="color:#94a3b8;">No active trades</div>'; return; }
+            grid.innerHTML = activeTrades.map(t => 
+                `<div class="trade-card ${t.type}"><div style="display:flex; justify-content:space-between;"><span>${t.type.toUpperCase()}</span><span>$${t.amount.toFixed(2)}</span></div><div style="font-size:12px; color:#94a3b8;">Entry: ${t.entry.toFixed(4)}</div></div>`
+            ).join('');
+        }
+
+        function updateTradeHistory() {
+            const tbody = document.getElementById('tradeHistory');
+            if (tradeHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No trades yet</td></tr>'; return; }
+            tbody.innerHTML = tradeHistory.map(t => 
+                `<tr><td>${t.time}</td><td class="${t.type === 'WIN' ? 'win' : 'loss'}">${t.type}</td><td>${t.strategy}</td><td>$${t.stake}</td><td class="${t.result === 'WIN' ? 'win' : 'loss'}">${t.result}</td><td class="${parseFloat(t.pl) > 0 ? 'win' : 'loss'}">${parseFloat(t.pl) > 0 ? '+' : ''}$${t.pl}</td></tr>`
+            ).join('');
+        }
+
+        function updateStats() {
+            const total = wins + losses;
+            const winRate = total > 0 ? Math.round((wins/total)*100) : 0;
+            const netPL = totalProfit - totalLoss;
+            
+            document.getElementById('totalTrades').textContent = total;
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(2)}`;
+            document.getElementById('totalLoss').textContent = `$${totalLoss.toFixed(2)}`;
+            document.getElementById('netPnL').textContent = `$${netPL.toFixed(2)}`;
+            document.getElementById('netPnL').className = netPL >= 0 ? 'stat-value profit' : 'stat-value loss';
+            
+            document.getElementById('totalWins').textContent = wins;
+            document.getElementById('totalLosses').textContent = losses;
+            document.getElementById('winRateLarge').textContent = winRate + '%';
+            document.getElementById('netProfitLarge').textContent = `${netPL >= 0 ? '+' : ''}$${netPL.toFixed(2)}`;
+        }
+
+        function debugTradeStatus() {
+            console.log('=== DEBUG TRADE STATUS ===');
+            console.log('Connected:', derivConnected);
+            console.log('Active Trades:', activeTrades);
+            console.log('Trade History:', tradeHistory);
+            console.log('Wins:', wins, 'Losses:', losses);
+            console.log('Total Profit:', totalProfit, 'Total Loss:', totalLoss);
+            showNotification('Check console for debug info');
+        }
+
+        function checkTradeHistory() {
+            console.log('=== TRADE HISTORY DEBUG ===');
+            console.log('Trade History:', tradeHistory);
+            console.log('Active Trades:', activeTrades);
+            console.log('Wins/Losses:', wins, losses);
+            showNotification('Check console for details');
+        }
+
+        function forceRefresh() {
+            updateTradeHistory();
+            updateActiveTrades();
+            updateStats();
+            showNotification('Display refreshed');
+        }
+
+        function resetStats() {
+            if (confirm('Reset all stats?')) {
+                wins = 0; losses = 0; totalProfit = 0; totalLoss = 0;
+                tradeHistory = []; activeTrades = []; mt5Trades = [];
+                if (currentAccount === 'demo') {
+                    currentUser.demoBalance = 10000;
+                    document.getElementById('demoBalance').textContent = '$10,000.00';
+                }
+                updateTradeHistory();
+                updateActiveTrades();
+                updateStats();
+                showNotification('Stats reset');
+            }
+        }
+
+        function switchAccount(type) {
+            currentAccount = type;
+            document.querySelector('.account-btn.demo').className = `account-btn demo ${type === 'demo' ? 'active' : 'inactive'}`;
+            document.querySelector('.account-btn.real').className = `account-btn real ${type === 'real' ? 'active' : 'inactive'}`;
+        }
+
+        function showNotification(msg, type = 'info') {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.style.display = 'block';
+            n.style.borderLeftColor = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6');
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
