@@ -8,6 +8,8 @@ interface Trade {
   profit: number;
   win: boolean;
   timestamp: Date;
+  strategy?: string;
+  digit?: number;
 }
 
 interface RecentTradesProps {
@@ -15,14 +17,29 @@ interface RecentTradesProps {
 }
 
 const RecentTrades: React.FC<RecentTradesProps> = ({ trades }) => {
+  console.log('📊 RecentTrades received:', trades.length, 'trades');
+
+  if (trades.length === 0) {
+    return (
+      <div className="recent-trades">
+        <h3>Recent Trades</h3>
+        <div className="no-trades-message">
+          <p>No trades yet. Start trading to see results!</p>
+          <p className="hint">💡 Try clicking EVEN or ODD buttons in MANUAL mode</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="recent-trades">
-      <h3>Recent Trades</h3>
+      <h3>Recent Trades ({trades.length})</h3>
       <div className="trades-table">
         <table>
           <thead>
             <tr>
               <th>Time</th>
+              <th>Strategy</th>
               <th>Type</th>
               <th>Stake</th>
               <th>Profit</th>
@@ -30,24 +47,20 @@ const RecentTrades: React.FC<RecentTradesProps> = ({ trades }) => {
             </tr>
           </thead>
           <tbody>
-            {trades.map((trade, index) => (
+            {trades.slice(0, 10).map((trade, index) => (
               <tr key={trade.id || index}>
                 <td>{new Date(trade.timestamp).toLocaleTimeString()}</td>
+                <td>{trade.strategy || 'Manual'}</td>
                 <td>{trade.type}</td>
                 <td>${trade.stake.toFixed(2)}</td>
                 <td className={trade.win ? 'profit' : 'loss'}>
-                  ${trade.profit.toFixed(2)}
+                  {trade.win ? '+' : ''}{trade.profit.toFixed(2)}
                 </td>
                 <td className={trade.win ? 'win' : 'loss'}>
                   {trade.win ? 'WIN' : 'LOSS'}
                 </td>
               </tr>
             ))}
-            {trades.length === 0 && (
-              <tr>
-                <td colSpan={5} className="no-trades">No trades yet. Start trading to see results!</td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>

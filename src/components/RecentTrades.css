@@ -6,7 +6,19 @@
 .recent-trades h3 {
   color: white;
   margin-bottom: 16px;
-  font-size: 1.1rem;
+  font-size: 1rem;
+}
+
+.no-trades-message {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}
+
+.no-trades-message .hint {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  color: #8b5cf6;
 }
 
 .trades-table {
@@ -16,18 +28,18 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 th {
   text-align: left;
-  padding: 10px;
+  padding: 10px 8px;
   color: #94a3b8;
   border-bottom: 1px solid #2d2d3a;
 }
 
 td {
-  padding: 10px;
+  padding: 8px;
   color: white;
   border-bottom: 1px solid #2d2d3a;
 }
@@ -45,10 +57,4 @@ td {
 .win {
   color: #10b981;
   font-weight: bold;
-}
-
-.no-trades {
-  text-align: center;
-  color: #64748b;
-  padding: 40px;
 }
