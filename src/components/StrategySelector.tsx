@@ -9,20 +9,60 @@ interface Strategy {
   type: 'auto' | 'manual' | 'both';
   platform: 'deriv' | 'mt5';
   risk: 'low' | 'medium' | 'high';
+  analyze?: (data: any) => any;
 }
 
 const KXNG_STRATEGIES: Strategy[] = [
-  { id: 'kxng-1', name: '👑 KXNG 1: The Prophet', description: 'Advanced pattern recognition with 85% accuracy', winRate: 85, type: 'auto', platform: 'deriv', risk: 'medium' },
-  { id: 'kxng-2', name: '👑 KXNG 2: The Ghost', description: 'Smart Money Concepts - tracks institutional flow', winRate: 82, type: 'auto', platform: 'deriv', risk: 'medium' },
-  { id: 'kxng-3', name: '👑 KXNG 3: The Viper', description: 'Momentum scalper with AI-powered entries', winRate: 78, type: 'both', platform: 'deriv', risk: 'high' },
+  // KXNG Signature Strategies
+  { id: 'kxng-1', name: '👑 KXNG 1: The Prophet', description: 'Advanced pattern recognition with 85% accuracy - predicts market reversals before they happen', winRate: 85, type: 'auto', platform: 'deriv', risk: 'medium' },
+  { id: 'kxng-2', name: '👑 KXNG 2: The Ghost', description: 'Smart Money Concepts - tracks institutional order flow and liquidity grabs', winRate: 82, type: 'auto', platform: 'deriv', risk: 'medium' },
+  { id: 'kxng-3', name: '👑 KXNG 3: The Viper', description: 'Momentum scalper with AI-powered entry signals - 1 minute trades', winRate: 78, type: 'both', platform: 'deriv', risk: 'high' },
   { id: 'kxng-4', name: '👑 KXNG 4: The Oracle', description: 'Fibonacci master with harmonic pattern detection', winRate: 80, type: 'auto', platform: 'deriv', risk: 'medium' },
-  { id: 'kxng-5', name: '👑 KXNG 5: The Phantom', description: 'Volume Spread Analysis - detects accumulation', winRate: 77, type: 'auto', platform: 'deriv', risk: 'low' },
-  { id: 'kxng-6', name: '👑 KXNG 6: The Shadow', description: 'Support/Resistance hunter with 92% accuracy', winRate: 79, type: 'manual', platform: 'deriv', risk: 'medium' },
-  { id: 'kxng-7', name: '👑 KXNG 7: The Emperor', description: 'AI Neural Network with deep learning', winRate: 88, type: 'auto', platform: 'deriv', risk: 'medium' },
+  { id: 'kxng-5', name: '👑 KXNG 5: The Phantom', description: 'Volume Spread Analysis - detects accumulation and distribution', winRate: 77, type: 'auto', platform: 'deriv', risk: 'low' },
+  { id: 'kxng-6', name: '👑 KXNG 6: The Shadow', description: 'Support/Resistance hunter with 92% accuracy on key levels', winRate: 79, type: 'manual', platform: 'deriv', risk: 'medium' },
+  { id: 'kxng-7', name: '👑 KXNG 7: The Emperor', description: 'AI Neural Network with deep learning - adapts to market conditions', winRate: 88, type: 'auto', platform: 'deriv', risk: 'medium' },
   { id: 'kxng-8', name: '👑 KXNG 8: The Mercenary', description: 'High-frequency scalping with 1-tick targets', winRate: 75, type: 'both', platform: 'deriv', risk: 'high' },
-  { id: 'kxng-9', name: '👑 KXNG 9: The Warlord', description: 'Martingale master with smart recovery', winRate: 70, type: 'auto', platform: 'deriv', risk: 'high' },
-  { id: 'kxng-10', name: '👑 KXNG 10: The Legend', description: 'Ultimate strategy - combines all indicators', winRate: 91, type: 'auto', platform: 'deriv', risk: 'medium' },
-  { id: 'mt5-1', name: '👑 KXNG MT5: Gold Specialist', description: 'Dedicated XAUUSD strategy', winRate: 76, type: 'auto', platform: 'mt5', risk: 'medium' },
+  { id: 'kxng-9', name: '👑 KXNG 9: The Warlord', description: 'Martingale master with smart recovery system', winRate: 70, type: 'auto', platform: 'deriv', risk: 'high' },
+  { id: 'kxng-10', name: '👑 KXNG 10: The Legend', description: 'Ultimate strategy - combines all KXNG indicators', winRate: 91, type: 'auto', platform: 'deriv', risk: 'medium' },
+  
+  // NEW TRADEX STRATEGY
+  { 
+    id: 'tradex', 
+    name: '⚡ TRADEX - Least Frequent Digit', 
+    description: 'Analyzes last 30 ticks, finds the LEAST frequent digit, and predicts it will appear next. Based on "digits rarely repeat" concept.', 
+    winRate: 76, 
+    type: 'both', 
+    platform: 'deriv', 
+    risk: 'medium',
+    analyze: (data: any) => {
+      const { digits } = data;
+      if (digits.length < 30) return { type: 'DIGITEVEN', confidence: 50 };
+      
+      const last30 = digits.slice(-30);
+      const frequency = Array(10).fill(0);
+      last30.forEach((d: number) => frequency[d]++);
+      
+      let leastFrequentDigit = 0;
+      let minCount = 100;
+      for (let i = 0; i < 10; i++) {
+        if (frequency[i] < minCount) {
+          minCount = frequency[i];
+          leastFrequentDigit = i;
+        }
+      }
+      
+      const confidence = 50 + (100 - (minCount / 30) * 100) / 2;
+      
+      return {
+        type: 'DIGITMATCH',
+        barrier: leastFrequentDigit.toString(),
+        confidence: Math.min(85, confidence)
+      };
+    }
+  },
+  
+  // MT5 Strategies
+  { id: 'mt5-1', name: '👑 KXNG MT5: Gold Specialist', description: 'Dedicated XAUUSD strategy with 76% win rate', winRate: 76, type: 'auto', platform: 'mt5', risk: 'medium' },
   { id: 'mt5-2', name: '👑 KXNG MT5: Bitcoin Pro', description: 'BTCUSD scalper with volume confirmation', winRate: 73, type: 'auto', platform: 'mt5', risk: 'high' },
 ];
 

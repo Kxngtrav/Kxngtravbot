@@ -12,7 +12,7 @@ interface TradingControlsProps {
   onResetStats?: () => void;
   accountType?: 'demo' | 'real';
   balance?: number;
-  onTradePlaced?: (trade: any) => void;
+  digitHistory?: number[];
 }
 
 const TradingControls: React.FC<TradingControlsProps> = ({
@@ -26,7 +26,7 @@ const TradingControls: React.FC<TradingControlsProps> = ({
   onResetStats,
   accountType = 'demo',
   balance = 0,
-  onTradePlaced
+  digitHistory = []
 }) => {
   const [tradeMode, setTradeMode] = useState<'auto' | 'manual'>('auto');
   const [hedgeMode, setHedgeMode] = useState(false);
@@ -34,10 +34,8 @@ const TradingControls: React.FC<TradingControlsProps> = ({
   const [durationUnit, setDurationUnit] = useState<'t' | 'm'>('t');
   const [stake, setStake] = useState(0.35);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [contractType, setContractType] = useState<string>('');
-  const [contractBarrier, setContractBarrier] = useState<string>('');
-  const [quickStakeOptions] = useState([0.35, 0.50, 1.00, 2.00, 5.00, 10.00]);
-  const [durationOptions] = useState([1, 2, 3, 4, 5, 10, 15, 30, 45, 60]);
+  const [leastFrequentDigit, setLeastFrequentDigit] = useState<number | null>(null);
+  const [digitFrequency, setDigitFrequency] = useState<number[]>(Array(10).fill(0));
 
   // Auto-trading effect
   useEffect(() => {
@@ -47,6 +45,25 @@ const TradingControls: React.FC<TradingControlsProps> = ({
       derivService.stopAutoTrading();
     }
   }, [isTrading, tradeMode, selectedStrategy, derivService, stake]);
+
+  // Calculate least frequent digit for TradeX
+  useEffect(() => {
+    if (digitHistory.length >= 10) {
+      const freq = Array(10).fill(0);
+      digitHistory.slice(-30).forEach(d => freq[d]++);
+      setDigitFrequency(freq);
+      
+      let leastFreq = 0;
+      let minCount = 100;
+      for (let i = 0; i < 10; i++) {
+        if (freq[i] < minCount) {
+          minCount = freq[i];
+          leastFreq = i;
+        }
+      }
+      setLeastFrequentDigit(leastFreq);
+    }
+  }, [digitHistory]);
 
   const placeManualTrade = (type: string, barrier?: string) => {
     if (!connected || !derivService) return;
@@ -67,17 +84,16 @@ const TradingControls: React.FC<TradingControlsProps> = ({
     
     console.log('📤 Manual trade:', contract);
     derivService.placeTrade(contract);
+  };
+
+  const handleTradeX = () => {
+    if (digitHistory.length < 30) {
+      alert(`Need at least 30 ticks of data. Currently have ${digitHistory.length} ticks.`);
+      return;
+    }
     
-    // Notify parent about trade placement
-    if (onTradePlaced) {
-      onTradePlaced({
-        type: type,
-        stake: stake,
-        duration: duration,
-        durationUnit: durationUnit,
-        timestamp: new Date(),
-        barrier: barrier
-      });
+    if (leastFrequentDigit !== null) {
+      placeManualTrade('DIGITMATCH', leastFrequentDigit.toString());
     }
   };
 
@@ -123,11 +139,35 @@ const TradingControls: React.FC<TradingControlsProps> = ({
         </div>
       </div>
 
+      {/* TradeX Info Card */}
+      {leastFrequentDigit !== null && digitHistory.length >= 30 && (
+        <div className="tradex-info">
+          <div className="tradex-header">
+            <span className="tradex-icon">⚡</span>
+            <span>TRADEX ANALYSIS</span>
+          </div>
+          <div className="digit-frequencies">
+            {[0,1,2,3,4,5,6,7,8,9].map(d => (
+              <div key={d} className={`freq-digit ${leastFrequentDigit === d ? 'least' : ''}`}>
+                <span className="digit-num">{d}</span>
+                <div className="freq-bar" style={{ height: `${(digitFrequency[d] / 30) * 100}%` }}></div>
+                <span className="freq-percent">{((digitFrequency[d] / 30) * 100).toFixed(1)}%</span>
+              </div>
+            ))}
+          </div>
+          <div className="tradex-prediction">
+            <span>🎯 LEAST FREQUENT DIGIT: </span>
+            <strong className="prediction-digit">{leastFrequentDigit}</strong>
+            <button onClick={handleTradeX} className="tradex-btn-sm">TRADE NOW</button>
+          </div>
+        </div>
+      )}
+
       {/* Quick Stake Options */}
       <div className="quick-stakes">
         <label>💰 Quick Stake:</label>
         <div className="stake-buttons">
-          {quickStakeOptions.map(amount => (
+          {[0.35, 0.50, 1.00, 2.00, 5.00, 10.00].map(amount => (
             <button
               key={amount}
               className={`stake-btn ${stake === amount ? 'active' : ''}`}
@@ -142,24 +182,15 @@ const TradingControls: React.FC<TradingControlsProps> = ({
       {/* Mode Selector */}
       <div className="control-row">
         <div className="mode-selector">
-          <button 
-            className={tradeMode === 'auto' ? 'active' : ''}
-            onClick={() => setTradeMode('auto')}
-          >
+          <button className={tradeMode === 'auto' ? 'active' : ''} onClick={() => setTradeMode('auto')}>
             🤖 AUTO
           </button>
-          <button 
-            className={tradeMode === 'manual' ? 'active' : ''}
-            onClick={() => setTradeMode('manual')}
-          >
+          <button className={tradeMode === 'manual' ? 'active' : ''} onClick={() => setTradeMode('manual')}>
             ✋ MANUAL
           </button>
         </div>
 
-        <button 
-          className={`hedge-toggle ${hedgeMode ? 'active' : ''}`}
-          onClick={() => setHedgeMode(!hedgeMode)}
-        >
+        <button className={`hedge-toggle ${hedgeMode ? 'active' : ''}`} onClick={() => setHedgeMode(!hedgeMode)}>
           {hedgeMode ? '🛡️ HEDGE ON' : '⚔️ HEDGE OFF'}
         </button>
       </div>
@@ -168,7 +199,7 @@ const TradingControls: React.FC<TradingControlsProps> = ({
       <div className="duration-controls">
         <label>⏱️ Duration:</label>
         <div className="duration-buttons">
-          {durationOptions.slice(0, 5).map(dur => (
+          {[1, 2, 3, 4, 5, 10, 15, 30].map(dur => (
             <button
               key={dur}
               className={`duration-btn ${duration === dur ? 'active' : ''}`}
@@ -256,12 +287,17 @@ const TradingControls: React.FC<TradingControlsProps> = ({
             </div>
           </div>
 
+          {/* TRADEX Button */}
           <div className="button-group">
-            <h4>⚡ Quick Trade</h4>
+            <h4>⚡ TRADEX - Least Frequent Digit</h4>
             <div className="button-row">
-              <button onClick={() => placeManualTrade('DIGITEVEN')} className="btn-quick">QUICK EVEN</button>
-              <button onClick={() => placeManualTrade('DIGITODD')} className="btn-quick">QUICK ODD</button>
+              <button onClick={handleTradeX} className="btn-tradex">
+                ⚡ TRADEX
+              </button>
             </div>
+            {digitHistory.length < 30 && (
+              <p className="hint-text">Need {30 - digitHistory.length} more ticks for analysis</p>
+            )}
           </div>
         </div>
       )}

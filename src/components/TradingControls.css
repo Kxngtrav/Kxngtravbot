@@ -444,3 +444,128 @@
   background: #3b82f6;
   border-radius: 4px;
 }
+
+/* TradeX Styles */
+.tradex-info {
+  background: linear-gradient(135deg, #1a1a2e, #2d1a3a);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #8b5cf6;
+}
+
+.tradex-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b5cf6;
+  font-weight: bold;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.tradex-icon {
+  font-size: 1.2rem;
+}
+
+.digit-frequencies {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.freq-digit {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.digit-num {
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.freq-bar {
+  width: 100%;
+  background: linear-gradient(0deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+  min-height: 2px;
+  transition: height 0.3s;
+}
+
+.freq-percent {
+  color: #64748b;
+  font-size: 0.6rem;
+}
+
+.freq-digit.least .digit-num {
+  color: #ec4899;
+  font-weight: bold;
+}
+
+.freq-digit.least .freq-bar {
+  background: linear-gradient(0deg, #ec4899, #f59e0b);
+}
+
+.tradex-prediction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #2d2d3a;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.prediction-digit {
+  font-size: 1.2rem;
+  color: #ec4899;
+  background: rgba(236, 72, 153, 0.2);
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin: 0 8px;
+}
+
+.tradex-btn-sm {
+  padding: 6px 12px;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.tradex-btn-sm:hover {
+  transform: scale(1.05);
+}
+
+.btn-tradex {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: white;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.btn-tradex:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.hint-text {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-align: center;
+  margin-top: 4px;
+}

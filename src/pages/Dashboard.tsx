@@ -16,6 +16,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ apiToken, accountType, platform }) => {
   const [currentPrice, setCurrentPrice] = useState(1234.56);
   const [lastDigit, setLastDigit] = useState(4);
+  const [digitHistory, setDigitHistory] = useState<number[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [trades, setTrades] = useState<any[]>([]);
   const [balance, setBalance] = useState(accountType === 'demo' ? 10000 : 0);
@@ -67,14 +68,12 @@ const Dashboard: React.FC<DashboardProps> = ({ apiToken, accountType, platform }
         setConnectionError(null);
         
         if (accountType === 'demo' && !apiToken) {
-          // Demo account without token - create new demo account
           console.log('Creating new Deriv demo account...');
           await derivService.current?.createDemoAccount();
           setConnected(true);
           setBalance(10000);
           console.log('Demo account created successfully');
         } else {
-          // Connect with token
           console.log('Connecting with token...');
           await derivService.current?.connect(apiToken, accountType === 'demo');
           setConnected(true);
@@ -104,7 +103,16 @@ const Dashboard: React.FC<DashboardProps> = ({ apiToken, accountType, platform }
       derivService.current.on('tick', (data: any) => {
         if (data && data.price) {
           setCurrentPrice(data.price);
-          setLastDigit(Math.floor(data.price) % 10);
+          const digit = Math.floor(data.price) % 10;
+          setLastDigit(digit);
+          
+          // Update digit history for TradeX strategy
+          setDigitHistory(prev => {
+            const newHistory = [...prev, digit];
+            // Keep last 100 digits
+            if (newHistory.length > 100) newHistory.shift();
+            return newHistory;
+          });
           
           // Update chart data
           setChartData(prev => {
@@ -140,7 +148,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apiToken, accountType, platform }
         }
       });
 
-      // TRADE UPDATES - THIS SHOWS TRADES IN THE TABLE
+      // TRADE UPDATES - Shows trades in Recent Trades table
       derivService.current.on('trade', (trade: any) => {
         console.log('✅ Trade received in Dashboard:', trade);
         setTrades(prev => {
@@ -230,6 +238,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apiToken, accountType, platform }
             onResetStats={resetStats}
             accountType={accountType}
             balance={balance}
+            digitHistory={digitHistory}
           />
         </div>
 
